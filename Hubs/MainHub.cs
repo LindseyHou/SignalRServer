@@ -72,6 +72,7 @@ namespace SignalRServer.Hubs
         {
             var task = this.CallAsync(methodName);
             task.Wait();
+            Debug.WriteLine("GetData({0}): {1}", methodName, task.Result);
             return task.Result;
         }
     }
