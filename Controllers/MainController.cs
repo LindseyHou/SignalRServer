@@ -35,9 +35,9 @@ namespace SignalRServer.Controllers
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                var words = message.Split('\n');
-                await hubContext.Clients.All.SendAsync(words[0], words[1]);
-                _logger.LogInformation(" [x] Received \t methodName:{0} \t String:{1}", words[0], words[1]);
+                var lines = message.Split('\n');
+                await hubContext.Clients.All.SendAsync(lines[0], lines[1]);
+                _logger.LogInformation(" [x] Received \t methodName:{0} \t String:{1}", lines[0], lines[1]);
             };
             channel.BasicConsume(queue: "SendMessage", autoAck: true, consumer: consumer);
         }
