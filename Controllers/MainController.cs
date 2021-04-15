@@ -36,8 +36,24 @@ namespace SignalRServer.Controllers
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var lines = message.Split('\n');
-                await hubContext.Clients.All.SendAsync(lines[0], lines[1]);
-                _logger.LogInformation(" [x] Received \t methodName:{0} \t String:{1}", lines[0], lines[1]);
+                var groupName = lines[0];
+                var methodName = lines[1];
+                var data = lines[2];
+                _logger.LogInformation(
+                    " [x] Received {0} \t groupName:{1} \t methodName:{2} \t String:{3}",
+                    DateTime.Now.ToString("u"),
+                    groupName,
+                    methodName,
+                    data
+                );
+                if (groupName == "ALL")
+                {
+                    await hubContext.Clients.All.SendAsync(methodName, data);
+                }
+                else
+                {
+                    await hubContext.Clients.Group(groupName).SendAsync(methodName, data);
+                }
             };
             channel.BasicConsume(queue: "SendMessage", autoAck: true, consumer: consumer);
         }

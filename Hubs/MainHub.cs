@@ -68,12 +68,21 @@ namespace SignalRServer.Hubs
         {
             await Clients.All.SendAsync("OnConnectedAsync", "Hello world");
         }
-        public string GetData(string methodName)
+        public string GetData(string groupName, string methodName)
         {
-            var task = this.CallAsync(methodName);
+            var message = groupName + "\n" + methodName;
+            var task = this.CallAsync(message);
             task.Wait();
-            Debug.WriteLine("GetData({0}): {1}", methodName, task.Result);
+            Debug.WriteLine("GetData({0}, {1}): {2}", groupName, methodName, task.Result);
             return task.Result;
+        }
+        public async Task AddToGroup(string groupName)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+        }
+        public async Task RemoveFromGroup(string groupName)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
         }
     }
 }
