@@ -76,6 +76,30 @@ namespace SignalRServer.Hubs
             Debug.WriteLine("GetData({0}, {1}): {2}", groupName, methodName, task.Result);
             return task.Result;
         }
+       
+        public string PostBuildingInfo(string groupName,string postDataStr)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("124.71.176.240");
+            request.Method = "POST";
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = Encoding.UTF8.GetByteCount(postDataStr);
+            
+            Stream myRequestStream = request.GetRequestStream();
+            StreamWriter myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding("gb2312"));
+            
+            myStreamWriter.Write(postDataStr);
+            myStreamWriter.Close();
+ 
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+ 
+            Stream myResponseStream = response.GetResponseStream();
+            StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.GetEncoding("utf-8"));
+            string postresponse = myStreamReader.ReadToEnd();
+            myStreamReader.Close();
+            myResponseStream.Close();
+ 
+            return postresponse;
+        }
         public async Task AddToGroup(string groupName)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
