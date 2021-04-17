@@ -79,7 +79,7 @@ namespace SignalRServer.Hubs
        
         public string PostBuildingInfo(string groupName,string postDataStr)
         {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("124.71.176.240");
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://124.71.176.240:8000/api/v1/data/buildinfo");
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
             request.ContentLength = Encoding.UTF8.GetByteCount(postDataStr);
