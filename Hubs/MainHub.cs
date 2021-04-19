@@ -71,7 +71,7 @@ namespace SignalRServer.Hubs
         {
             await Clients.All.SendAsync("OnConnectedAsync", "Hello world");
         }
-        public string GetData(string methodName, string groupName="None")
+        public string GetData(string methodName, string groupName="")
         {
             var message =  methodName + '&' + groupName;
             var task = this.CallAsync(message);
