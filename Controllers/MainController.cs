@@ -35,7 +35,7 @@ namespace SignalRServer.Controllers
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                var lines = message.Split('\n');
+                var lines = message.Split('&');
                 var groupName = lines[0];
                 var methodName = lines[1];
                 var data = lines[2];
