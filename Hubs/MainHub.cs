@@ -88,7 +88,7 @@ namespace SignalRServer.Hubs
             request.ContentLength = Encoding.UTF8.GetByteCount(postDataStr);
             
             Stream myRequestStream = request.GetRequestStream();
-            StreamWriter myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding("gb2312"));
+            StreamWriter myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding("utf-8"));
             
             myStreamWriter.Write(postDataStr);
             myStreamWriter.Close();
