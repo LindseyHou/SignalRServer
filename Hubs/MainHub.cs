@@ -7,6 +7,9 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Concurrent;
+using System.Net.Http;
+using System.Net;
+using System.IO;
 
 namespace SignalRServer.Hubs
 {
@@ -77,7 +80,7 @@ namespace SignalRServer.Hubs
             return task.Result;
         }
        
-        public string PostBuildingInfo(string groupName,string postDataStr)
+        public string PostBuildingInfo(string postDataStr)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:8000/api/v1/data/buildinfo");
             request.Method = "POST";
