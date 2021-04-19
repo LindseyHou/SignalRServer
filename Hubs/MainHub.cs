@@ -80,9 +80,8 @@ namespace SignalRServer.Hubs
             return task.Result;
         }
        
-        public string PostBuildInfo(JObject postDataStr)
+        public string PostBuildInfo(string postDataStr)
         {
-            // HttpClient client = new HttpClient();
             HttpClient client = new HttpClient();
             var content = new StringContent(postDataStr);
   
