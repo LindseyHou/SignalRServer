@@ -17,4 +17,4 @@ jobs:
             cd ~/SignalRServer
             git reset --hard && git pull -f
             screen -S signalR -X quit
-            screen -dmS siganlR dotnet watch run -p SignalRServer.csproj
+            screen -dmS signalR dotnet watch run -p SignalRServer.csproj
