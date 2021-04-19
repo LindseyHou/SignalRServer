@@ -80,29 +80,29 @@ namespace SignalRServer.Hubs
             return task.Result;
         }
        
-        // public string PostBuildInfo(string groupName,string postDataStr)
-        // {
-        //     HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:8000/api/v1/data/buildinfo");
-        //     request.Method = "POST";
-        //     request.ContentType = "application/x-www-form-urlencoded";
-        //     request.ContentLength = Encoding.UTF8.GetByteCount(postDataStr);
+        public string PostBuildInfo(string postDataStr)
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:8000/api/v1/data/buildinfo");
+            request.Method = "POST";
+            request.ContentType = "application/x-www-form-urlencoded";
+            request.ContentLength = Encoding.UTF8.GetByteCount(postDataStr);
             
-        //     Stream myRequestStream = request.GetRequestStream();
-        //     StreamWriter myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding("gb2312"));
+            Stream myRequestStream = request.GetRequestStream();
+            StreamWriter myStreamWriter = new StreamWriter(myRequestStream, Encoding.GetEncoding("gb2312"));
             
-        //     myStreamWriter.Write(postDataStr);
-        //     myStreamWriter.Close();
+            myStreamWriter.Write(postDataStr);
+            myStreamWriter.Close();
  
-        //     HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
  
-        //     Stream myResponseStream = response.GetResponseStream();
-        //     StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.GetEncoding("utf-8"));
-        //     string postresponse = myStreamReader.ReadToEnd();
-        //     myStreamReader.Close();
-        //     myResponseStream.Close();
- 
-        //     return postresponse;
-        // }
+            Stream myResponseStream = response.GetResponseStream();
+            StreamReader myStreamReader = new StreamReader(myResponseStream, Encoding.GetEncoding("utf-8"));
+            string postresponse = myStreamReader.ReadToEnd();
+            myStreamReader.Close();
+            myResponseStream.Close();
+            Debug.WriteLine("PostBuildInfo({0}):{1} ", postDataStr,postresponse);
+            return postresponse;
+        }
         public async Task AddToGroup(string groupName)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
