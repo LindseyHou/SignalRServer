@@ -100,18 +100,5 @@ namespace SignalRServer.Hubs
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
             await Clients.Group(groupName).SendAsync("ReceiveMessage",Context.ConnectionId+" Quit Group: "+groupName);
         }
-        public void JoinGroup(string groupName)
-        {
-            var task = this.AddToGroup(groupName);
-            task.Wait();
-            
-        }
-
-        public void QuitGroup(string groupName)
-        {
-            var task = this.RemoveFromGroup(groupName);
-            task.Wait();
-            
-        }
     }
 }
