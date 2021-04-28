@@ -93,12 +93,12 @@ namespace SignalRServer.Hubs
         public async Task AddToGroup(string groupName)
         {
             // await Clients.Group(groupName).SendAsync("ReceiveMessage","Join Group: "+groupName);
+            Console.WriteLine("[96]: "+Context.ConnectionId);
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         }
         public async Task RemoveFromGroup(string groupName)
         {
             // await Clients.Group(groupName).SendAsync("ReceiveMessage","Quit Group: "+groupName);
-            Console.WriteLine("[101]: "+Context.ConnectionId);
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
         }
         public void JoinGroup(string groupName)
