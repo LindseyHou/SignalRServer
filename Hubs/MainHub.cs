@@ -92,21 +92,24 @@ namespace SignalRServer.Hubs
         }
         public async Task AddToGroup(string groupName)
         {
-            // await Clients.Group(groupName).SendAsync("ReceiveMessage","Join Group: "+groupName);
-            Console.WriteLine("[96]: "+Context.ConnectionId);
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         }
         public async Task RemoveFromGroup(string groupName)
         {
-            // await Clients.Group(groupName).SendAsync("ReceiveMessage","Quit Group: "+groupName);
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
         }
         public void JoinGroup(string groupName)
         {
-            Console.WriteLine("[105]: "+Context.ConnectionId);
             var task = this.AddToGroup(groupName);
             task.Wait();
-            Clients.Group(groupName).SendAsync("ReceiveMessage",Context.ConnectionId+" Join Group: "+groupName);
+            await Clients.Group(groupName).SendAsync("ReceiveMessage",Context.ConnectionId+" Join Group: "+groupName);
+        }
+
+        public void QuitGroup(string groupName)
+        {
+            var task = this.RemoveFromGroup(groupName);
+            task.Wait();
+            await Clients.Group(groupName).SendAsync("ReceiveMessage",Context.ConnectionId+" Quit Group: "+groupName);
         }
     }
 }
