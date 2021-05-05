@@ -18,7 +18,7 @@ namespace SignalRServer.Hubs
         private const string QUEUE_NAME = "rpc_queue";
         private readonly IConnection connection;
         private readonly IModel channel;
-        private readonly string replyQueueName = "ReceiveMessage";
+        private readonly string replyQueueName;
         private readonly EventingBasicConsumer consumer;
         private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> callbackMapper =
                     new ConcurrentDictionary<string, TaskCompletionSource<string>>();
@@ -49,6 +49,7 @@ namespace SignalRServer.Hubs
             var correlationId = Guid.NewGuid().ToString();
             props.CorrelationId = correlationId;
             props.ReplyTo = replyQueueName;
+            
             var messageBytes = Encoding.UTF8.GetBytes(message);
             var tcs = new TaskCompletionSource<string>();
             callbackMapper.TryAdd(correlationId, tcs);
