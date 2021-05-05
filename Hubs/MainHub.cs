@@ -18,7 +18,7 @@ namespace SignalRServer.Hubs
         private const string QUEUE_NAME = "rpc_queue";
         private readonly IConnection connection;
         private readonly IModel channel;
-        private readonly string replyQueueName;
+        private readonly string replyQueueName = "ReceiveMessage";
         private readonly EventingBasicConsumer consumer;
         private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> callbackMapper =
                     new ConcurrentDictionary<string, TaskCompletionSource<string>>();
