@@ -74,10 +74,20 @@ namespace SignalRServer.Hubs
         }
         public string GetData(string methodName, string groupName="")
         {
-            var message =  methodName + '&' + groupName;
+            var message =  "GetData&"+methodName + '&' + groupName;
             var task = this.CallAsync(message);
             task.Wait();
             Debug.WriteLine("GetData({0}, {1}): {2}", methodName, groupName, task.Result);
+            return task.Result;
+        }
+        public string GetDatas(string methodName, List<string> groupNames){
+            var message = "GetDatas&"+methodName;
+            for(int i=0;i<groupNames.Count;i++){
+                message += '&'+groupNames[i];
+            }
+            var task = this.CallAsync(message);
+            task.Wait();
+            Debug.WriteLine("GetDatas({0})",methodName);
             return task.Result;
         }
        
