@@ -10,6 +10,7 @@ using System.Collections.Concurrent;
 using System.Net.Http;
 using System.Net;
 using System.IO;
+using System.Collections.Generic;
 
 namespace SignalRServer.Hubs
 {
