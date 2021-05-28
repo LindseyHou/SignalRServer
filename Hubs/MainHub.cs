@@ -44,13 +44,16 @@ namespace SignalRServer.Hubs
                 tcs.TrySetResult(response);
             };
         }
+        ~MainHub(){
+            connection.Close();
+        }
         private Task<string> CallAsync(string message, CancellationToken cancellationToken = default(CancellationToken))
         {
             IBasicProperties props = channel.CreateBasicProperties();
             var correlationId = Guid.NewGuid().ToString();
             props.CorrelationId = correlationId;
             props.ReplyTo = replyQueueName;
-            
+
             var messageBytes = Encoding.UTF8.GetBytes(message);
             var tcs = new TaskCompletionSource<string>();
             callbackMapper.TryAdd(correlationId, tcs);
@@ -73,44 +76,46 @@ namespace SignalRServer.Hubs
         {
             await Clients.All.SendAsync("OnConnectedAsync", "Hello world");
         }
-        public string GetData(string methodName, string groupName="")
+        public string GetData(string methodName, string groupName = "")
         {
-            var message =  "GetData&"+methodName + '&' + groupName;
+            var message = "GetData&" + methodName + '&' + groupName;
             var task = this.CallAsync(message);
             task.Wait();
             Debug.WriteLine("GetData({0}, {1}): {2}", methodName, groupName, task.Result);
             return task.Result;
         }
-        public string GetDatas(string methodName, List<string> groupNames){
-            var message = "GetDatas&"+methodName;
-            for(int i=0;i<groupNames.Count;i++){
-                message += '&'+groupNames[i];
+        public string GetDatas(string methodName, List<string> groupNames)
+        {
+            var message = "GetDatas&" + methodName;
+            for (int i = 0; i < groupNames.Count; i++)
+            {
+                message += '&' + groupNames[i];
             }
             var task = this.CallAsync(message);
             task.Wait();
-            Debug.WriteLine("GetDatas({0})",methodName);
+            Debug.WriteLine("GetDatas({0})", methodName);
             return task.Result;
         }
-       
+
         public string PostBuildInfo(string postDataStr)
         {
             HttpClient client = new HttpClient();
             var content = new StringContent(postDataStr);
-  
+
             var response = client.PostAsync("http://127.0.0.1:8000/api/v1/data/buildinfo", content).Result;
-  
+
             var responseString = response.Content.ReadAsStringAsync().Result;
             return responseString;
         }
         public async Task AddToGroup(string groupName)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-            await Clients.Group(groupName).SendAsync("ReceiveMessage",Context.ConnectionId+" Join Group: "+groupName);
+            await Clients.Group(groupName).SendAsync("ReceiveMessage", Context.ConnectionId + " Join Group: " + groupName);
         }
         public async Task RemoveFromGroup(string groupName)
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
-            await Clients.Group(groupName).SendAsync("ReceiveMessage",Context.ConnectionId+" Quit Group: "+groupName);
+            await Clients.Group(groupName).SendAsync("ReceiveMessage", Context.ConnectionId + " Quit Group: " + groupName);
         }
     }
 }
