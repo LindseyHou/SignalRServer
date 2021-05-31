@@ -33,7 +33,12 @@ namespace SignalRServer.Hubs
                                 exclusive: false,
                                 autoDelete: false,
                                 arguments: null);
-            replyQueueName = channel.QueueDeclare(queue: DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString()).QueueName;
+            replyQueueName = channel.QueueDeclare(
+                queue: DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString(),
+                durable: false,
+                autoDelete: true,
+                arguments: null
+            ).QueueName;
             consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
             {
@@ -78,10 +83,6 @@ namespace SignalRServer.Hubs
         public override async Task OnConnectedAsync()
         {
             await Clients.All.SendAsync("OnConnectedAsync", "Hello world");
-        }
-        public override async Task OnDisconnectedAsync(Exception exc)
-        {
-            await Task.Run(connection.Close);
         }
         public string GetData(string methodName, string groupName = "")
         {
