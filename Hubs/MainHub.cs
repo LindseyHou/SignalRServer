@@ -79,6 +79,10 @@ namespace SignalRServer.Hubs
         {
             await Clients.All.SendAsync("OnConnectedAsync", "Hello world");
         }
+        public override async Task OnDisconnectedAsync(Exception exc)
+        {
+            await Task.Run(connection.Close);
+        }
         public string GetData(string methodName, string groupName = "")
         {
             var message = "GetData&" + methodName + '&' + groupName;
