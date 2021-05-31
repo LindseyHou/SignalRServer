@@ -33,7 +33,7 @@ namespace SignalRServer.Hubs
                                 exclusive: false,
                                 autoDelete: false,
                                 arguments: null);
-            replyQueueName = channel.QueueDeclare().QueueName;
+            replyQueueName = channel.QueueDeclare(queue: DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString()).QueueName;
             consumer = new EventingBasicConsumer(channel);
             consumer.Received += (model, ea) =>
             {
@@ -43,9 +43,12 @@ namespace SignalRServer.Hubs
                 var response = Encoding.UTF8.GetString(body);
                 tcs.TrySetResult(response);
             };
+            Debug.WriteLine("construct");
         }
-        ~MainHub(){
+        ~MainHub()
+        {
             connection.Close();
+            Debug.WriteLine("destruct");
         }
         private Task<string> CallAsync(string message, CancellationToken cancellationToken = default(CancellationToken))
         {
