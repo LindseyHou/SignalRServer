@@ -16,99 +16,28 @@ namespace SignalRServer.Hubs
 {
     public class MainHub : Hub
     {
-        private const string QUEUE_NAME = "rpc_queue";
-        private readonly IConnection connection;
-        private readonly IModel channel;
-        private readonly string replyQueueName;
-        private readonly EventingBasicConsumer consumer;
-        private readonly ConcurrentDictionary<string, TaskCompletionSource<string>> callbackMapper =
-                    new ConcurrentDictionary<string, TaskCompletionSource<string>>();
-        public MainHub()
-        {
-            var factory = new ConnectionFactory() { HostName = "localhost" };
-            connection = factory.CreateConnection();
-            channel = connection.CreateModel();
-            channel.QueueDeclare(queue: "ReceiveMessage",
-                                durable: false,
-                                exclusive: false,
-                                autoDelete: false,
-                                arguments: null);
-            var args = new Dictionary<string, object>();
-            args.Add("x-message-ttl", 60000);
-            replyQueueName = channel.QueueDeclare(
-                queue: DateTimeOffset.Now.ToUnixTimeMilliseconds().ToString(),
-                durable: false,
-                autoDelete: true,
-                arguments: args
-            ).QueueName;
-            consumer = new EventingBasicConsumer(channel);
-            consumer.Received += (model, ea) =>
-            {
-                if (!callbackMapper.TryRemove(ea.BasicProperties.CorrelationId, out TaskCompletionSource<string> tcs))
-                    return;
-                var body = ea.Body.ToArray();
-                var response = Encoding.UTF8.GetString(body);
-                tcs.TrySetResult(response);
-            };
-            Debug.WriteLine("construct");
-        }
-        ~MainHub()
-        {
-            connection.Close();
-            Debug.WriteLine("destruct");
-        }
-        private Task<string> CallAsync(string message, CancellationToken cancellationToken = default(CancellationToken))
-        {
-            IBasicProperties props = channel.CreateBasicProperties();
-            var correlationId = Guid.NewGuid().ToString();
-            props.CorrelationId = correlationId;
-            props.ReplyTo = replyQueueName;
-
-            var messageBytes = Encoding.UTF8.GetBytes(message);
-            var tcs = new TaskCompletionSource<string>();
-            callbackMapper.TryAdd(correlationId, tcs);
-
-            channel.BasicPublish(
-                exchange: "",
-                routingKey: QUEUE_NAME,
-                basicProperties: props,
-                body: messageBytes);
-
-            channel.BasicConsume(
-                consumer: consumer,
-                queue: replyQueueName,
-                autoAck: true);
-
-            cancellationToken.Register(() => callbackMapper.TryRemove(correlationId, out var tmp));
-            return tcs.Task;
-        }
         public override async Task OnConnectedAsync()
         {
             await Clients.All.SendAsync("OnConnectedAsync", "Hello world");
         }
-        public override async Task OnDisconnectedAsync(Exception exc)
-        {
-            await Task.Run(connection.Close);
-        }
         public string GetData(string methodName, string groupName = "")
         {
-            var message = "GetData&" + methodName + '&' + groupName;
-            var task = this.CallAsync(message);
-            task.Wait();
-            Debug.WriteLine("GetData({0}, {1}): {2}", methodName, groupName, task.Result);
-            return task.Result;
+            HttpClient client = new HttpClient();
+            var response = client.GetAsync("http://127.0.0.1:8001/data?methodName=" + methodName + "&groupName=" + groupName).Result;
+            var responseString = response.Content.ReadAsStringAsync().Result;
+            return responseString;
         }
         public string GetDatas(string methodName, List<string> groupNames)
         {
-            var message = "GetDatas&" + methodName;
+            HttpClient client = new HttpClient();
+            var url = "http://127.0.0.1:8001/datas??methodName=" + methodName;
             for (int i = 0; i < groupNames.Count; i++)
             {
-                message += '&' + groupNames[i];
+                url += "&groupNames=" + groupNames[i];
             }
-            var task = this.CallAsync(message);
-            task.Wait();
-            Debug.WriteLine("GetDatas({0})", methodName);
-            return task.Result;
+            var response = client.GetAsync(url).Result;
+            var responseString = response.Content.ReadAsStringAsync().Result;
+            return responseString;
         }
 
         public string PostBuildInfo(string postDataStr)
