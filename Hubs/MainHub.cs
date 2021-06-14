@@ -23,14 +23,15 @@ namespace SignalRServer.Hubs
         public string GetData(string methodName, string groupName = "")
         {
             HttpClient client = new HttpClient();
-            var response = client.GetAsync("http://127.0.0.1:8001/data?methodName=" + methodName + "&groupName=" + groupName).Result;
+            var url = "http://127.0.0.1:8091/data?methodName=" + methodName + "&groupName=" + groupName;
+            var response = client.GetAsync(url).Result;
             var responseString = response.Content.ReadAsStringAsync().Result;
             return responseString;
         }
         public string GetDatas(string methodName, List<string> groupNames)
         {
             HttpClient client = new HttpClient();
-            var url = "http://127.0.0.1:8001/datas??methodName=" + methodName;
+            var url = "http://127.0.0.1:8091/datas??methodName=" + methodName;
             for (int i = 0; i < groupNames.Count; i++)
             {
                 url += "&groupNames=" + groupNames[i];
