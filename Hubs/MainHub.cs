@@ -31,7 +31,7 @@ namespace SignalRServer.Hubs
         public string GetDatas(string methodName, List<string> groupNames)
         {
             HttpClient client = new HttpClient();
-            var url = "http://127.0.0.1:8091/datas??methodName=" + methodName;
+            var url = "http://127.0.0.1:8091/datas?methodName=" + methodName;
             for (int i = 0; i < groupNames.Count; i++)
             {
                 url += "&groupNames=" + groupNames[i];
